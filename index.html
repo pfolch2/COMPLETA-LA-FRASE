@@ -4,97 +4,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Completem les frases</title>
+<title>Completa les frases</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: #f2f2f2;
     margin: 0;
     padding: 20px;
-    text-align: center;
+    color: #111;
 }
 
 h1 {
+    text-align: center;
     font-size: 30px;
-}
-
-.instruccions {
-    font-size: 19px;
     margin-bottom: 25px;
 }
 
-.exercicis {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 20px;
-    max-width: 1300px;
+.contenidor {
+    max-width: 1000px;
     margin: auto;
 }
 
 .exercici {
     background: white;
-    border: 3px solid #333;
-    border-radius: 15px;
-    padding: 18px;
-    min-height: 230px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-sizing: border-box;
+    border: 2px solid #222;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
 }
 
 .numero {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: bold;
-    text-align: left;
     margin-bottom: 15px;
 }
 
 .frase {
-    font-size: 21px;
-    line-height: 1.8;
-    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 25px;
+    line-height: 2;
+    margin-bottom: 15px;
+}
+
+.paraula-audio {
+    display: inline-block;
+    padding: 1px 2px;
+    border-radius: 3px;
+}
+
+.paraula-audio.activa {
+    text-decoration: underline;
+    text-decoration-thickness: 4px;
+    text-underline-offset: 5px;
+    background: #fff1a8;
 }
 
 .icona {
     font-size: 38px;
-    vertical-align: middle;
     margin: 0 5px;
 }
 
 input {
-    width: 125px;
-    max-width: 40%;
-    font-size: 20px;
-    font-weight: bold;
+    width: 180px;
+    max-width: 45vw;
+    font-size: 23px;
+    padding: 8px;
+    border: 2px solid #333;
+    border-radius: 6px;
     text-align: center;
-    border: none;
-    border-bottom: 3px solid #333;
-    background: #fffde8;
-    padding: 5px;
-    outline: none;
-}
-
-input:focus {
-    background: #fff5bd;
-    border-bottom-color: #2673b8;
+    text-transform: uppercase;
 }
 
 .botons {
     display: flex;
-    justify-content: center;
-    gap: 8px;
     flex-wrap: wrap;
-    margin-top: 15px;
+    gap: 10px;
 }
 
 button {
     border: none;
     border-radius: 8px;
-    padding: 11px 13px;
-    font-size: 14px;
+    padding: 12px 18px;
+    font-size: 17px;
     font-weight: bold;
     cursor: pointer;
 }
@@ -103,29 +102,49 @@ button:active {
     transform: scale(0.97);
 }
 
-.corregir {
-    background: #a8d5a2;
+.boto-audio {
+    background: #d9eaff;
 }
 
-.reiniciar {
-    background: #f4c6a6;
+.boto-correcte {
+    background: #d9f2d9;
 }
 
-.play {
-    background: #b8d9f5;
-    font-size: 15px;
+.boto-reinicia {
+    background: #eeeeee;
 }
 
-.missatge {
-    font-size: 17px;
+.resultat {
+    font-size: 19px;
     font-weight: bold;
-    min-height: 25px;
-    margin-top: 10px;
+    margin-top: 12px;
+    min-height: 24px;
 }
 
-@media (max-width: 500px) {
+.correcte {
+    color: #16802b;
+}
+
+.incorrecte {
+    color: #c00000;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
     .frase {
-        font-size: 19px;
+        font-size: 21px;
+    }
+
+    input {
+        width: 140px;
+        font-size: 20px;
+    }
+
+    button {
+        font-size: 15px;
     }
 }
 </style>
@@ -133,353 +152,85 @@ button:active {
 
 <body>
 
-<h1>COMPLETEM LES FRASES</h1>
+<h1>COMPLETA LES FRASES</h1>
 
-<p class="instruccions">
-LLEGEIX LA FRASE, MIRA LA IMATGE I ESCRIU LA PARAULA QUE FALTA.
-</p>
-
-<div class="exercicis" id="exercicis"></div>
+<div class="contenidor" id="contenidor"></div>
 
 <script>
-
-// LES 40 PARAULES DE L'ACTIVITAT ANTERIOR
-
 const dades = [
+{paraula:"BOMBER",icona:"🚒",inici:"El ",final:" apaga el foc."},
+{paraula:"PALETA",icona:"👷",inici:"El ",final:" construeix una paret."},
+{paraula:"METGE",icona:"🩺",inici:"El ",final:" visita els pacients."},
+{paraula:"CUINERA",icona:"👩‍🍳",inici:"La ",final:" prepara el dinar."},
+{paraula:"PINTOR",icona:"🖌️",inici:"El ",final:" pinta una paret."},
+{paraula:"POLICIA",icona:"👮",inici:"El ",final:" ajuda les persones."},
+{paraula:"CARTER",icona:"📮",inici:"El ",final:" reparteix les cartes."},
+{paraula:"DENTISTA",icona:"🦷",inici:"El ",final:" revisa les dents."},
 
-{
-paraula:"BOMBER",
-icona:"🚒",
-inici:"El ",
-final:" apaga el foc.",
-audio:"El bomber apaga el foc."
-},
+{paraula:"PAELLA",icona:"🥘",inici:"Avui mengem una ",final:"."},
+{paraula:"MACARRONS",icona:"🍝",inici:"M'agrada menjar ",final:" amb tomàquet."},
+{paraula:"XOCOLATA",icona:"🍫",inici:"La ",final:" és dolça."},
+{paraula:"GELAT",icona:"🍦",inici:"A l'estiu menjo un ",final:"."},
+{paraula:"MELÓ",icona:"🍈",inici:"El ",final:" és una fruita."},
+{paraula:"PINYA",icona:"🍍",inici:"La ",final:" té una corona de fulles."},
+{paraula:"CIRERA",icona:"🍒",inici:"La ",final:" és una fruita petita."},
+{paraula:"PASTÍS",icona:"🧁",inici:"Avui és el meu aniversari i tinc un ",final:"."},
 
-{
-paraula:"PALETA",
-icona:"👷",
-inici:"El ",
-final:" construeix una paret.",
-audio:"El paleta construeix una paret."
-},
+{paraula:"PARAIGÜES",icona:"☂️",inici:"Quan plou faig servir el ",final:"."},
+{paraula:"CLAU",icona:"🔑",inici:"Obro la porta amb una ",final:"."},
+{paraula:"RELLOTGE",icona:"⌚",inici:"Miro l'hora al ",final:"."},
+{paraula:"MALETA",icona:"🧳",inici:"Quan viatjo, preparo la ",final:"."},
+{paraula:"LLANTERNA",icona:"🔦",inici:"La ",final:" il·lumina la foscor."},
+{paraula:"MIRALL",icona:"🪞",inici:"Em miro la cara al ",final:"."},
+{paraula:"ESCOMBRA",icona:"🧹",inici:"Faig servir l'",final:" per netejar el terra."},
+{paraula:"CANDELA",icona:"🕯️",inici:"La ",final:" fa llum."},
 
-{
-paraula:"METGE",
-icona:"🩺",
-inici:"El ",
-final:" visita els pacients.",
-audio:"El metge visita els pacients."
-},
+{paraula:"MICROSCOPI",icona:"🔬",inici:"Amb el ",final:" podem veure coses molt petites."},
+{paraula:"ROBOT",icona:"🤖",inici:"El ",final:" pot fer diferents tasques."},
+{paraula:"SATÈL·LIT",icona:"🛰️",inici:"El ",final:" gira al voltant de la Terra."},
+{paraula:"COET",icona:"🚀",inici:"El ",final:" viatja a l'espai."},
+{paraula:"PILA",icona:"🔋",inici:"La ",final:" dona energia a la joguina."},
+{paraula:"CÀMERA",icona:"📷",inici:"Amb la ",final:" faig fotografies."},
+{paraula:"MICRÒFON",icona:"🎤",inici:"Amb el ",final:" puc parlar i cantar."},
+{paraula:"AURICULARS",icona:"🎧",inici:"Escolto música amb els ",final:"."},
 
-{
-paraula:"CUINERA",
-icona:"👩‍🍳",
-inici:"La ",
-final:" prepara el dinar.",
-audio:"La cuinera prepara el dinar."
-},
-
-{
-paraula:"PINTOR",
-icona:"🖌️",
-inici:"El ",
-final:" pinta una paret.",
-audio:"El pintor pinta una paret."
-},
-
-{
-paraula:"POLICIA",
-icona:"👮",
-inici:"El ",
-final:" ajuda les persones.",
-audio:"El policia ajuda les persones."
-},
-
-{
-paraula:"CARTER",
-icona:"📮",
-inici:"El ",
-final:" reparteix les cartes.",
-audio:"El carter reparteix les cartes."
-},
-
-{
-paraula:"DENTISTA",
-icona:"🦷",
-inici:"El ",
-final:" revisa les dents.",
-audio:"El dentista revisa les dents."
-},
-
-{
-paraula:"PAELLA",
-icona:"🥘",
-inici:"Avui mengem una ",
-final:".",
-audio:"Avui mengem una paella."
-},
-
-{
-paraula:"MACARRONS",
-icona:"🍝",
-inici:"M'agrada menjar ",
-final:" amb tomàquet.",
-audio:"M'agrada menjar macarrons amb tomàquet."
-},
-
-{
-paraula:"XOCOLATA",
-icona:"🍫",
-inici:"La ",
-final:" és dolça.",
-audio:"La xocolata és dolça."
-},
-
-{
-paraula:"GELAT",
-icona:"🍦",
-inici:"A l'estiu menjo un ",
-final:".",
-audio:"A l'estiu menjo un gelat."
-},
-
-{
-paraula:"MELÓ",
-icona:"🍈",
-inici:"El ",
-final:" és una fruita.",
-audio:"El meló és una fruita."
-},
-
-{
-paraula:"PINYA",
-icona:"🍍",
-inici:"La ",
-final:" té una corona de fulles.",
-audio:"La pinya té una corona de fulles."
-},
-
-{
-paraula:"CIRERA",
-icona:"🍒",
-inici:"La ",
-final:" és una fruita petita.",
-audio:"La cirera és una fruita petita."
-},
-
-{
-paraula:"PASTÍS",
-icona:"🧁",
-inici:"Avui és el meu aniversari i tinc un ",
-final:".",
-audio:"Avui és el meu aniversari i tinc un pastís."
-},
-
-{
-paraula:"PARAIGÜES",
-icona:"☂️",
-inici:"Quan plou faig servir el ",
-final:".",
-audio:"Quan plou faig servir el paraigües."
-},
-
-{
-paraula:"CLAU",
-icona:"🔑",
-inici:"Obro la porta amb una ",
-final:".",
-audio:"Obro la porta amb una clau."
-},
-
-{
-paraula:"RELLOTGE",
-icona:"⌚",
-inici:"Miro l'hora al ",
-final:".",
-audio:"Miro l'hora al rellotge."
-},
-
-{
-paraula:"MALETA",
-icona:"🧳",
-inici:"Quan viatjo, preparo la ",
-final:".",
-audio:"Quan viatjo, preparo la maleta."
-},
-
-{
-paraula:"LLANTERNA",
-icona:"🔦",
-inici:"La ",
-final:" il·lumina la foscor.",
-audio:"La llanterna il·lumina la foscor."
-},
-
-{
-paraula:"MIRALL",
-icona:"🪞",
-inici:"Em miro la cara al ",
-final:".",
-audio:"Em miro la cara al mirall."
-},
-
-{
-paraula:"ESCOMBRA",
-icona:"🧹",
-inici:"Faig servir l'",
-final:" per netejar el terra.",
-audio:"Faig servir l'escombra per netejar el terra."
-},
-
-{
-paraula:"CANDELA",
-icona:"🕯️",
-inici:"La ",
-final:" fa llum.",
-audio:"La candela fa llum."
-},
-
-{
-paraula:"MICROSCOPI",
-icona:"🔬",
-inici:"Amb el ",
-final:" podem veure coses molt petites.",
-audio:"Amb el microscopi podem veure coses molt petites."
-},
-
-{
-paraula:"ROBOT",
-icona:"🤖",
-inici:"El ",
-final:" pot fer diferents tasques.",
-audio:"El robot pot fer diferents tasques."
-},
-
-{
-paraula:"SATÈL·LIT",
-icona:"🛰️",
-inici:"El ",
-final:" gira al voltant de la Terra.",
-audio:"El satèl·lit gira al voltant de la Terra."
-},
-
-{
-paraula:"COET",
-icona:"🚀",
-inici:"El ",
-final:" viatja a l'espai.",
-audio:"El coet viatja a l'espai."
-},
-
-{
-paraula:"PILA",
-icona:"🔋",
-inici:"La ",
-final:" dona energia a la joguina.",
-audio:"La pila dona energia a la joguina."
-},
-
-{
-paraula:"CÀMERA",
-icona:"📷",
-inici:"Amb la ",
-final:" faig fotografies.",
-audio:"Amb la càmera faig fotografies."
-},
-
-{
-paraula:"MICRÒFON",
-icona:"🎤",
-inici:"Amb el ",
-final:" puc parlar i cantar.",
-audio:"Amb el micròfon puc parlar i cantar."
-},
-
-{
-paraula:"AURICULARS",
-icona:"🎧",
-inici:"Escolto música amb els ",
-final:".",
-audio:"Escolto música amb els auriculars."
-},
-
-{
-paraula:"FLAUTA",
-icona:"🪈",
-inici:"La ",
-final:" és un instrument musical.",
-audio:"La flauta és un instrument musical."
-},
-
-{
-paraula:"TROMPETA",
-icona:"🎺",
-inici:"La ",
-final:" fa un so molt fort.",
-audio:"La trompeta fa un so molt fort."
-},
-
-{
-paraula:"SAXÒFON",
-icona:"🎷",
-inici:"El ",
-final:" és un instrument de vent.",
-audio:"El saxòfon és un instrument de vent."
-},
-
-{
-paraula:"NOTA",
-icona:"🎵",
-inici:"Aquesta ",
-final:" musical sona molt bé.",
-audio:"Aquesta nota musical sona molt bé."
-},
-
-{
-paraula:"PARTITURA",
-icona:"🎼",
-inici:"El músic llegeix la ",
-final:".",
-audio:"El músic llegeix la partitura."
-},
-
-{
-paraula:"PALETA",
-icona:"🎨",
-inici:"El pintor posa els colors a la ",
-final:".",
-audio:"El pintor posa els colors a la paleta."
-},
-
-{
-paraula:"TEATRE",
-icona:"🎭",
-inici:"Anem al ",
-final:" a veure una obra.",
-audio:"Anem al teatre a veure una obra."
-},
-
-{
-paraula:"ESCULTURA",
-icona:"🗿",
-inici:"Al museu hi ha una ",
-final:" de pedra.",
-audio:"Al museu hi ha una escultura de pedra."
-}
-
+{paraula:"FLAUTA",icona:"🪈",inici:"La ",final:" és un instrument musical."},
+{paraula:"TROMPETA",icona:"🎺",inici:"La ",final:" fa un so molt fort."},
+{paraula:"SAXÒFON",icona:"🎷",inici:"El ",final:" és un instrument de vent."},
+{paraula:"NOTA",icona:"🎵",inici:"Aquesta ",final:" musical sona molt bé."},
+{paraula:"PARTITURA",icona:"🎼",inici:"El músic llegeix la ",final:"."},
+{paraula:"PALETA",icona:"🎨",inici:"El pintor posa els colors a la ",final:"."},
+{paraula:"TEATRE",icona:"🎭",inici:"Anem al ",final:" a veure una obra."},
+{paraula:"ESCULTURA",icona:"🗿",inici:"Al museu hi ha una ",final:" de pedra."}
 ];
 
-const contenidor = document.getElementById("exercicis");
+const contenidor = document.getElementById("contenidor");
 
 function normalitzar(text) {
     return text
         .trim()
-        .toLocaleUpperCase("ca")
-        .normalize("NFC");
+        .toUpperCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
 }
 
-dades.forEach((dada, index) => {
+// Converteix cada paraula visible en un element que es pot subratllar.
+function crearTextAmbParaules(text, prefix) {
+    return text.split(/(\s+)/).map((t, i) => {
+        if (/^\s+$/.test(t)) {
+            return document.createTextNode(t);
+        }
 
+        const span = document.createElement("span");
+        span.className = "paraula-audio";
+        span.textContent = t;
+        span.dataset.idparaula = prefix + "-" + i;
+        return span;
+    });
+}
+
+// Crea les 40 activitats.
+dades.forEach((dada, index) => {
     const exercici = document.createElement("div");
     exercici.className = "exercici";
 
@@ -490,110 +241,157 @@ dades.forEach((dada, index) => {
     const frase = document.createElement("div");
     frase.className = "frase";
 
-    const inici = document.createTextNode(dada.inici);
+    const inici = crearTextAmbParaules(dada.inici, "inici");
+    inici.forEach(element => frase.appendChild(element));
 
     const icona = document.createElement("span");
     icona.className = "icona";
     icona.textContent = dada.icona;
-
-    const input = document.createElement("input");
-    input.type = "text";
-    input.autocomplete = "off";
-    input.setAttribute("aria-label", "Escriu la paraula que falta");
-
-    const final = document.createTextNode(dada.final);
-
-    frase.appendChild(inici);
     frase.appendChild(icona);
-    frase.appendChild(input);
-    frase.appendChild(final);
+
+    const entrada = document.createElement("input");
+    entrada.type = "text";
+    entrada.setAttribute("aria-label", "Escriu la paraula");
+    frase.appendChild(entrada);
+
+    const final = crearTextAmbParaules(dada.final, "final");
+    final.forEach(element => frase.appendChild(element));
 
     const botons = document.createElement("div");
     botons.className = "botons";
 
-    const botoPlay = document.createElement("button");
-    botoPlay.className = "play";
-    botoPlay.textContent = "▶ PLAY";
+    const botoAudio = document.createElement("button");
+    botoAudio.className = "boto-audio";
+    botoAudio.textContent = "▶ PLAY";
 
     const botoCorregir = document.createElement("button");
-    botoCorregir.className = "corregir";
+    botoCorregir.className = "boto-correcte";
     botoCorregir.textContent = "CORREGIR";
 
     const botoReiniciar = document.createElement("button");
-    botoReiniciar.className = "reiniciar";
+    botoReiniciar.className = "boto-reinicia";
     botoReiniciar.textContent = "TORNAR A COMENÇAR";
 
-    const missatge = document.createElement("div");
-    missatge.className = "missatge";
+    const resultat = document.createElement("div");
+    resultat.className = "resultat";
 
-    botons.appendChild(botoPlay);
+    botons.appendChild(botoAudio);
     botons.appendChild(botoCorregir);
     botons.appendChild(botoReiniciar);
 
     exercici.appendChild(numero);
     exercici.appendChild(frase);
     exercici.appendChild(botons);
-    exercici.appendChild(missatge);
+    exercici.appendChild(resultat);
 
     contenidor.appendChild(exercici);
 
-    // CORREGIR
-
-    botoCorregir.addEventListener("click", () => {
-
-        if (normalitzar(input.value) === normalitzar(dada.paraula)) {
-            missatge.textContent = "MOLT BÉ! CORRECTE!";
-            missatge.style.color = "green";
-        } else {
-            missatge.textContent = "TORNA-HO A PROVAR!";
-            missatge.style.color = "red";
-        }
-
-    });
-
-    // TORNAR A COMENÇAR
-
-    botoReiniciar.addEventListener("click", () => {
-
-        input.value = "";
-        missatge.textContent = "";
-        input.focus();
-
-    });
-
-    // LECTOR DE VEU EN CATALÀ
-
-    botoPlay.addEventListener("click", () => {
-
-        if (!("speechSynthesis" in window)) {
-            missatge.textContent = "EL TEU NAVEGADOR NO PERMET LLEGIR EN VEU ALTA.";
-            missatge.style.color = "red";
-            return;
-        }
-
+    // LECTURA DE LA FRASE SENSE DIR LA PARAULA QUE FALTA.
+    botoAudio.addEventListener("click", () => {
         window.speechSynthesis.cancel();
 
-        const fraseAudio = new SpeechSynthesisUtterance(dada.audio);
-        fraseAudio.lang = "ca-ES";
-        fraseAudio.rate = 0.85;
-        fraseAudio.pitch = 1;
+        // Elimina tots els subratllats anteriors.
+        document.querySelectorAll(".paraula-audio").forEach(p => {
+            p.classList.remove("activa");
+        });
 
-        const veus = window.speechSynthesis.getVoices();
+        const paraules = [];
 
-        const veuCatala = veus.find(veu =>
-            veu.lang.toLowerCase().startsWith("ca")
-        );
+        // Agafem només les paraules que es veuen a la frase.
+        const elements = [...inici, ...final];
 
-        if (veuCatala) {
-            fraseAudio.voice = veuCatala;
+        elements.forEach(element => {
+            if (element.nodeType === 1) {
+                paraules.push(element);
+            }
+        });
+
+        let posicio = 0;
+
+        function llegirSeguent() {
+            if (posicio >= paraules.length) {
+                return;
+            }
+
+            const element = paraules[posicio];
+
+            // Subratlla la paraula que s'està llegint.
+            document.querySelectorAll(".paraula-audio").forEach(p => {
+                p.classList.remove("activa");
+            });
+
+            element.classList.add("activa");
+
+            const veu = new SpeechSynthesisUtterance(
+                element.textContent
+            );
+
+            veu.lang = "ca-ES";
+            veu.rate = 0.85;
+            veu.pitch = 1;
+
+            const veus = window.speechSynthesis.getVoices();
+            const veuCatala = veus.find(v =>
+                v.lang.toLowerCase().startsWith("ca")
+            );
+
+            if (veuCatala) {
+                veu.voice = veuCatala;
+            }
+
+            veu.onend = () => {
+                posicio++;
+
+                // Pausa més llarga quan arriba a l'espai de la resposta.
+                if (posicio === inici.filter(e => e.nodeType === 1).length) {
+                    setTimeout(llegirSeguent, 650);
+                } else {
+                    setTimeout(llegirSeguent, 100);
+                }
+            };
+
+            veu.onerror = () => {
+                posicio++;
+                setTimeout(llegirSeguent, 100);
+            };
+
+            window.speechSynthesis.speak(veu);
         }
 
-        window.speechSynthesis.speak(fraseAudio);
-
+        if (paraules.length > 0) {
+            llegirSeguent();
+        }
     });
 
+    // CORRECCIÓ DE LA RESPOSTA.
+    botoCorregir.addEventListener("click", () => {
+        if (normalitzar(entrada.value) === normalitzar(dada.paraula)) {
+            resultat.textContent = "MOLT BÉ! RESPOSTA CORRECTA!";
+            resultat.className = "resultat correcte";
+        } else {
+            resultat.textContent = "TORNA-HO A PROVAR!";
+            resultat.className = "resultat incorrecte";
+        }
+    });
+
+    // REINICI DE L'ACTIVITAT.
+    botoReiniciar.addEventListener("click", () => {
+        entrada.value = "";
+        resultat.textContent = "";
+        resultat.className = "resultat";
+
+        document.querySelectorAll(".paraula-audio").forEach(p => {
+            p.classList.remove("activa");
+        });
+
+        window.speechSynthesis.cancel();
+    });
 });
 
+// Carrega les veus disponibles del navegador.
+if ("speechSynthesis" in window) {
+    window.speechSynthesis.getVoices();
+}
 </script>
 
 </body>
