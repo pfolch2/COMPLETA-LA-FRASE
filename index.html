@@ -1,0 +1,600 @@
+
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Completem les frases</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 30px;
+}
+
+.instruccions {
+    font-size: 19px;
+    margin-bottom: 25px;
+}
+
+.exercicis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 20px;
+    max-width: 1300px;
+    margin: auto;
+}
+
+.exercici {
+    background: white;
+    border: 3px solid #333;
+    border-radius: 15px;
+    padding: 18px;
+    min-height: 230px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.numero {
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.frase {
+    font-size: 21px;
+    line-height: 1.8;
+    margin: 10px 0;
+}
+
+.icona {
+    font-size: 38px;
+    vertical-align: middle;
+    margin: 0 5px;
+}
+
+input {
+    width: 125px;
+    max-width: 40%;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-bottom: 3px solid #333;
+    background: #fffde8;
+    padding: 5px;
+    outline: none;
+}
+
+input:focus {
+    background: #fff5bd;
+    border-bottom-color: #2673b8;
+}
+
+.botons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+    padding: 11px 13px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.corregir {
+    background: #a8d5a2;
+}
+
+.reiniciar {
+    background: #f4c6a6;
+}
+
+.play {
+    background: #b8d9f5;
+    font-size: 15px;
+}
+
+.missatge {
+    font-size: 17px;
+    font-weight: bold;
+    min-height: 25px;
+    margin-top: 10px;
+}
+
+@media (max-width: 500px) {
+    .frase {
+        font-size: 19px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h1>COMPLETEM LES FRASES</h1>
+
+<p class="instruccions">
+LLEGEIX LA FRASE, MIRA LA IMATGE I ESCRIU LA PARAULA QUE FALTA.
+</p>
+
+<div class="exercicis" id="exercicis"></div>
+
+<script>
+
+// LES 40 PARAULES DE L'ACTIVITAT ANTERIOR
+
+const dades = [
+
+{
+paraula:"BOMBER",
+icona:"🚒",
+inici:"El ",
+final:" apaga el foc.",
+audio:"El bomber apaga el foc."
+},
+
+{
+paraula:"PALETA",
+icona:"👷",
+inici:"El ",
+final:" construeix una paret.",
+audio:"El paleta construeix una paret."
+},
+
+{
+paraula:"METGE",
+icona:"🩺",
+inici:"El ",
+final:" visita els pacients.",
+audio:"El metge visita els pacients."
+},
+
+{
+paraula:"CUINERA",
+icona:"👩‍🍳",
+inici:"La ",
+final:" prepara el dinar.",
+audio:"La cuinera prepara el dinar."
+},
+
+{
+paraula:"PINTOR",
+icona:"🖌️",
+inici:"El ",
+final:" pinta una paret.",
+audio:"El pintor pinta una paret."
+},
+
+{
+paraula:"POLICIA",
+icona:"👮",
+inici:"El ",
+final:" ajuda les persones.",
+audio:"El policia ajuda les persones."
+},
+
+{
+paraula:"CARTER",
+icona:"📮",
+inici:"El ",
+final:" reparteix les cartes.",
+audio:"El carter reparteix les cartes."
+},
+
+{
+paraula:"DENTISTA",
+icona:"🦷",
+inici:"El ",
+final:" revisa les dents.",
+audio:"El dentista revisa les dents."
+},
+
+{
+paraula:"PAELLA",
+icona:"🥘",
+inici:"Avui mengem una ",
+final:".",
+audio:"Avui mengem una paella."
+},
+
+{
+paraula:"MACARRONS",
+icona:"🍝",
+inici:"M'agrada menjar ",
+final:" amb tomàquet.",
+audio:"M'agrada menjar macarrons amb tomàquet."
+},
+
+{
+paraula:"XOCOLATA",
+icona:"🍫",
+inici:"La ",
+final:" és dolça.",
+audio:"La xocolata és dolça."
+},
+
+{
+paraula:"GELAT",
+icona:"🍦",
+inici:"A l'estiu menjo un ",
+final:".",
+audio:"A l'estiu menjo un gelat."
+},
+
+{
+paraula:"MELÓ",
+icona:"🍈",
+inici:"El ",
+final:" és una fruita.",
+audio:"El meló és una fruita."
+},
+
+{
+paraula:"PINYA",
+icona:"🍍",
+inici:"La ",
+final:" té una corona de fulles.",
+audio:"La pinya té una corona de fulles."
+},
+
+{
+paraula:"CIRERA",
+icona:"🍒",
+inici:"La ",
+final:" és una fruita petita.",
+audio:"La cirera és una fruita petita."
+},
+
+{
+paraula:"PASTÍS",
+icona:"🧁",
+inici:"Avui és el meu aniversari i tinc un ",
+final:".",
+audio:"Avui és el meu aniversari i tinc un pastís."
+},
+
+{
+paraula:"PARAIGÜES",
+icona:"☂️",
+inici:"Quan plou faig servir el ",
+final:".",
+audio:"Quan plou faig servir el paraigües."
+},
+
+{
+paraula:"CLAU",
+icona:"🔑",
+inici:"Obro la porta amb una ",
+final:".",
+audio:"Obro la porta amb una clau."
+},
+
+{
+paraula:"RELLOTGE",
+icona:"⌚",
+inici:"Miro l'hora al ",
+final:".",
+audio:"Miro l'hora al rellotge."
+},
+
+{
+paraula:"MALETA",
+icona:"🧳",
+inici:"Quan viatjo, preparo la ",
+final:".",
+audio:"Quan viatjo, preparo la maleta."
+},
+
+{
+paraula:"LLANTERNA",
+icona:"🔦",
+inici:"La ",
+final:" il·lumina la foscor.",
+audio:"La llanterna il·lumina la foscor."
+},
+
+{
+paraula:"MIRALL",
+icona:"🪞",
+inici:"Em miro la cara al ",
+final:".",
+audio:"Em miro la cara al mirall."
+},
+
+{
+paraula:"ESCOMBRA",
+icona:"🧹",
+inici:"Faig servir l'",
+final:" per netejar el terra.",
+audio:"Faig servir l'escombra per netejar el terra."
+},
+
+{
+paraula:"CANDELA",
+icona:"🕯️",
+inici:"La ",
+final:" fa llum.",
+audio:"La candela fa llum."
+},
+
+{
+paraula:"MICROSCOPI",
+icona:"🔬",
+inici:"Amb el ",
+final:" podem veure coses molt petites.",
+audio:"Amb el microscopi podem veure coses molt petites."
+},
+
+{
+paraula:"ROBOT",
+icona:"🤖",
+inici:"El ",
+final:" pot fer diferents tasques.",
+audio:"El robot pot fer diferents tasques."
+},
+
+{
+paraula:"SATÈL·LIT",
+icona:"🛰️",
+inici:"El ",
+final:" gira al voltant de la Terra.",
+audio:"El satèl·lit gira al voltant de la Terra."
+},
+
+{
+paraula:"COET",
+icona:"🚀",
+inici:"El ",
+final:" viatja a l'espai.",
+audio:"El coet viatja a l'espai."
+},
+
+{
+paraula:"PILA",
+icona:"🔋",
+inici:"La ",
+final:" dona energia a la joguina.",
+audio:"La pila dona energia a la joguina."
+},
+
+{
+paraula:"CÀMERA",
+icona:"📷",
+inici:"Amb la ",
+final:" faig fotografies.",
+audio:"Amb la càmera faig fotografies."
+},
+
+{
+paraula:"MICRÒFON",
+icona:"🎤",
+inici:"Amb el ",
+final:" puc parlar i cantar.",
+audio:"Amb el micròfon puc parlar i cantar."
+},
+
+{
+paraula:"AURICULARS",
+icona:"🎧",
+inici:"Escolto música amb els ",
+final:".",
+audio:"Escolto música amb els auriculars."
+},
+
+{
+paraula:"FLAUTA",
+icona:"🪈",
+inici:"La ",
+final:" és un instrument musical.",
+audio:"La flauta és un instrument musical."
+},
+
+{
+paraula:"TROMPETA",
+icona:"🎺",
+inici:"La ",
+final:" fa un so molt fort.",
+audio:"La trompeta fa un so molt fort."
+},
+
+{
+paraula:"SAXÒFON",
+icona:"🎷",
+inici:"El ",
+final:" és un instrument de vent.",
+audio:"El saxòfon és un instrument de vent."
+},
+
+{
+paraula:"NOTA",
+icona:"🎵",
+inici:"Aquesta ",
+final:" musical sona molt bé.",
+audio:"Aquesta nota musical sona molt bé."
+},
+
+{
+paraula:"PARTITURA",
+icona:"🎼",
+inici:"El músic llegeix la ",
+final:".",
+audio:"El músic llegeix la partitura."
+},
+
+{
+paraula:"PALETA",
+icona:"🎨",
+inici:"El pintor posa els colors a la ",
+final:".",
+audio:"El pintor posa els colors a la paleta."
+},
+
+{
+paraula:"TEATRE",
+icona:"🎭",
+inici:"Anem al ",
+final:" a veure una obra.",
+audio:"Anem al teatre a veure una obra."
+},
+
+{
+paraula:"ESCULTURA",
+icona:"🗿",
+inici:"Al museu hi ha una ",
+final:" de pedra.",
+audio:"Al museu hi ha una escultura de pedra."
+}
+
+];
+
+const contenidor = document.getElementById("exercicis");
+
+function normalitzar(text) {
+    return text
+        .trim()
+        .toLocaleUpperCase("ca")
+        .normalize("NFC");
+}
+
+dades.forEach((dada, index) => {
+
+    const exercici = document.createElement("div");
+    exercici.className = "exercici";
+
+    const numero = document.createElement("div");
+    numero.className = "numero";
+    numero.textContent = "FRASE " + (index + 1);
+
+    const frase = document.createElement("div");
+    frase.className = "frase";
+
+    const inici = document.createTextNode(dada.inici);
+
+    const icona = document.createElement("span");
+    icona.className = "icona";
+    icona.textContent = dada.icona;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.autocomplete = "off";
+    input.setAttribute("aria-label", "Escriu la paraula que falta");
+
+    const final = document.createTextNode(dada.final);
+
+    frase.appendChild(inici);
+    frase.appendChild(icona);
+    frase.appendChild(input);
+    frase.appendChild(final);
+
+    const botons = document.createElement("div");
+    botons.className = "botons";
+
+    const botoPlay = document.createElement("button");
+    botoPlay.className = "play";
+    botoPlay.textContent = "▶ PLAY";
+
+    const botoCorregir = document.createElement("button");
+    botoCorregir.className = "corregir";
+    botoCorregir.textContent = "CORREGIR";
+
+    const botoReiniciar = document.createElement("button");
+    botoReiniciar.className = "reiniciar";
+    botoReiniciar.textContent = "TORNAR A COMENÇAR";
+
+    const missatge = document.createElement("div");
+    missatge.className = "missatge";
+
+    botons.appendChild(botoPlay);
+    botons.appendChild(botoCorregir);
+    botons.appendChild(botoReiniciar);
+
+    exercici.appendChild(numero);
+    exercici.appendChild(frase);
+    exercici.appendChild(botons);
+    exercici.appendChild(missatge);
+
+    contenidor.appendChild(exercici);
+
+    // CORREGIR
+
+    botoCorregir.addEventListener("click", () => {
+
+        if (normalitzar(input.value) === normalitzar(dada.paraula)) {
+            missatge.textContent = "MOLT BÉ! CORRECTE!";
+            missatge.style.color = "green";
+        } else {
+            missatge.textContent = "TORNA-HO A PROVAR!";
+            missatge.style.color = "red";
+        }
+
+    });
+
+    // TORNAR A COMENÇAR
+
+    botoReiniciar.addEventListener("click", () => {
+
+        input.value = "";
+        missatge.textContent = "";
+        input.focus();
+
+    });
+
+    // LECTOR DE VEU EN CATALÀ
+
+    botoPlay.addEventListener("click", () => {
+
+        if (!("speechSynthesis" in window)) {
+            missatge.textContent = "EL TEU NAVEGADOR NO PERMET LLEGIR EN VEU ALTA.";
+            missatge.style.color = "red";
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+
+        const fraseAudio = new SpeechSynthesisUtterance(dada.audio);
+        fraseAudio.lang = "ca-ES";
+        fraseAudio.rate = 0.85;
+        fraseAudio.pitch = 1;
+
+        const veus = window.speechSynthesis.getVoices();
+
+        const veuCatala = veus.find(veu =>
+            veu.lang.toLowerCase().startsWith("ca")
+        );
+
+        if (veuCatala) {
+            fraseAudio.voice = veuCatala;
+        }
+
+        window.speechSynthesis.speak(fraseAudio);
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
