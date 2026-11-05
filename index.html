@@ -148,6 +148,7 @@ button:active {
     }
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 
 <body>
@@ -155,6 +156,11 @@ button:active {
 <h1>COMPLETA LES FRASES</h1>
 
 <div class="contenidor" id="contenidor"></div>
+    <div style="text-align:center; margin: 30px auto;">
+    <button id="descarregarPDF" style="background:#d9eaff; font-size:18px; padding:15px 25px;">
+        DESCARREGAR RESULTATS EN PDF
+    </button>
+</div>
 
 <script>
 const dades = [
@@ -205,6 +211,12 @@ const dades = [
 ];
 
 const contenidor = document.getElementById("contenidor");
+    // REGISTRE DELS RESULTATS DE LES 40 FRASES.
+const resultats = dades.map(dada => ({
+    paraula: dada.paraula,
+    resposta: "",
+    estat: "PENDENT"
+}));
 
 function normalitzar(text) {
     return text
@@ -364,34 +376,137 @@ dades.forEach((dada, index) => {
     });
 
     // CORRECCIÓ DE LA RESPOSTA.
-    botoCorregir.addEventListener("click", () => {
-        if (normalitzar(entrada.value) === normalitzar(dada.paraula)) {
-            resultat.textContent = "MOLT BÉ! RESPOSTA CORRECTA!";
-            resultat.className = "resultat correcte";
-        } else {
-            resultat.textContent = "TORNA-HO A PROVAR!";
-            resultat.className = "resultat incorrecte";
-        }
-    });
+        botoCorregir.addEventListener("click", () => {
 
-    // REINICI DE L'ACTIVITAT.
-    botoReiniciar.addEventListener("click", () => {
-        entrada.value = "";
-        resultat.textContent = "";
-        resultat.className = "resultat";
+            const respostaAlumne = entrada.value.trim();
 
-        document.querySelectorAll(".paraula-audio").forEach(p => {
-            p.classList.remove("activa");
+            resultats[index].resposta = respostaAlumne;
+
+            if (normalitzar(respostaAlumne) === normalitzar(dada.paraula)) {
+                resultat.textContent = "MOLT BÉ! RESPOSTA CORRECTA!";
+                resultat.className = "resultat correcte";
+                resultats[index].estat = "CORRECTE";
+            } else {
+                resultat.textContent = "TORNA-HO A PROVAR!";
+                resultat.className = "resultat incorrecte";
+                resultats[index].estat = "INCORRECTE";
+            }
         });
 
-        window.speechSynthesis.cancel();
+    // REINICI DE L'ACTIVITAT.
+        botoReiniciar.addEventListener("click", () => {
+            entrada.value = "";
+            resultat.textContent = "";
+            resultat.className = "resultat";
+
+    // Esborrem també el resultat guardat.
+    resultats[index].resposta = "";
+    resultats[index].estat = "PENDENT";
+
+    document.querySelectorAll(".paraula-audio").forEach(p => {
+        p.classList.remove("activa");
     });
+
+    window.speechSynthesis.cancel();
 });
 
 // Carrega les veus disponibles del navegador.
 if ("speechSynthesis" in window) {
     window.speechSynthesis.getVoices();
 }
+// DESCARREGAR ELS RESULTATS EN PDF.
+document.getElementById("descarregarPDF").addEventListener("click", () => {
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // Calculem els resultats.
+    const correctes = resultats.filter(r => r.estat === "CORRECTE").length;
+    const incorrectes = resultats.filter(r => r.estat === "INCORRECTE").length;
+    const pendents = resultats.filter(r => r.estat === "PENDENT").length;
+
+    let y = 20;
+
+    // TÍTOL.
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text("RESULTATS DE L'ACTIVITAT", 15, y);
+
+    y += 12;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(12);
+    doc.text("Activitat: Completa les frases", 15, y);
+
+    y += 9;
+    doc.text("Data: " + new Date().toLocaleDateString("ca-ES"), 15, y);
+
+    y += 9;
+    doc.text("Nom de l'alumne/a: __________________________", 15, y);
+
+    y += 15;
+
+    // RESUM.
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("RESUM DELS RESULTATS", 15, y);
+
+    y += 10;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+
+    doc.text("Respostes correctes: " + correctes + " de 40", 15, y);
+    y += 7;
+
+    doc.text("Respostes incorrectes: " + incorrectes, 15, y);
+    y += 7;
+
+    doc.text("Frases pendents: " + pendents, 15, y);
+    y += 15;
+
+    // RESULTATS DE CADA FRASE.
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("RESULTATS DE CADA FRASE", 15, y);
+
+    y += 12;
+
+    resultats.forEach((r, index) => {
+
+        // Si arribem al final de la pàgina, n'afegim una altra.
+        if (y > 265) {
+            doc.addPage();
+            y = 20;
+        }
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(11);
+
+        doc.text("FRASE " + (index + 1) + ": " + r.paraula, 15, y);
+
+        y += 7;
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+
+        doc.text(
+            "Resposta de l'alumne/a: " + (r.resposta || "Sense resposta"),
+            20,
+            y
+        );
+
+        y += 6;
+
+        doc.text("Resultat: " + r.estat, 20, y);
+
+        y += 10;
+    });
+
+    // Descarreguem el document.
+    doc.save("resultats_completa_les_frases.pdf");
+
+});
 </script>
 
 </body>
