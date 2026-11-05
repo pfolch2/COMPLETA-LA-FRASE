@@ -409,7 +409,8 @@ dades.forEach((dada, index) => {
 
     window.speechSynthesis.cancel();
 });
-
+}); // Tanquem el bucle de les 40 activitats.
+    
 // Carrega les veus disponibles del navegador.
 if ("speechSynthesis" in window) {
     window.speechSynthesis.getVoices();
